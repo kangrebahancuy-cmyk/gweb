@@ -291,16 +291,6 @@ export class GameScene extends Phaser.Scene {
     }).setDepth(1);
   }
 
-  private drawBuilding(g: Phaser.GameObjects.Graphics, x: number, y: number, w: number, h: number, wall: number, roof: number): void {
-    g.fillStyle(0x4c432e, 0.25).fillEllipse(x + w / 2, y + h + 8, w + 30, 24);
-    g.fillStyle(wall, 1).fillRect(x, y + 25, w, h - 25);
-    g.fillStyle(roof, 1);
-    g.fillTriangle(x - 14, y + 30, x + w / 2, y - 20, x + w + 14, y + 30);
-    g.fillStyle(0x6c4931, 1).fillRoundedRect(x + w / 2 - 13, y + h - 42, 26, 42, 4);
-    g.fillStyle(0xb4d4d0, 1).fillRect(x + 18, y + 45, 22, 20);
-    g.fillRect(x + w - 40, y + 45, 22, 20);
-  }
-
   private createWorldObjects(): void {
     // Invisible colliders correspond to buildings and the tree trunks.
     const blocks = [
