@@ -1,7 +1,11 @@
+import postgres from "postgres";
+
 export interface Env {
   GAME_ROOMS: DurableObjectNamespace;
   SUPABASE_URL: string;
   SUPABASE_ANON_KEY: string;
+  HYPERDRIVE?: Hyperdrive;
+  ALLOWED_ORIGIN?: string;
 }
 
 type ClientMessage =
@@ -19,21 +23,21 @@ export default {
     if (url.pathname === "/health") {
       return Response.json({ ok: true, service: "elder-realms-game-gateway" });
     }
+    if (url.pathname.startsWith("/api/")) {
+      if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(env) });
+      const user = await authenticate(request, env);
+      if (!user) return corsJson({ error: "Invalid or missing session" }, 401, env);
+      if (url.pathname === "/api/character" && (request.method === "GET" || request.method === "POST")) {
+        return handleCharacterRequest(request, env, user.id);
+      }
+      return corsJson({ error: "Not found" }, 404, env);
+    }
     if (url.pathname !== "/room") return new Response("Not found", { status: 404 });
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
       return new Response("WebSocket upgrade required", { status: 426 });
     }
-    const authorization = request.headers.get("Authorization");
-    if (!authorization?.startsWith("Bearer ")) {
-      return new Response("Authentication required", { status: 401 });
-    }
-    const token = authorization.slice("Bearer ".length).trim();
-    if (!token || !env.SUPABASE_URL) {
-      return new Response("Authentication is not configured", { status: 503 });
-    }
-    const user = await verifySupabaseUser(token, env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
-    if (!user) return new Response("Invalid or expired session", { status: 401 });
-
+    const user = await authenticate(request, env);
+    if (!user) return new Response("Invalid or missing session", { status: 401 });
     const roomId = url.searchParams.get("region") ?? "fern-hollow";
     if (!/^[a-z0-9-]{1,48}$/i.test(roomId)) return new Response("Invalid region", { status: 400 });
     const room = env.GAME_ROOMS.get(env.GAME_ROOMS.idFromName(roomId));
@@ -43,6 +47,85 @@ export default {
     return room.fetch(new Request(request, { headers }));
   }
 };
+
+function corsHeaders(env: Env): Headers {
+  return new Headers({
+    "Access-Control-Allow-Origin": env.ALLOWED_ORIGIN || "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Authorization, Content-Type",
+    "Access-Control-Max-Age": "86400"
+  });
+}
+
+function corsJson(body: unknown, status: number, env: Env): Response {
+  const headers = corsHeaders(env);
+  headers.set("Content-Type", "application/json; charset=utf-8");
+  return new Response(JSON.stringify(body), { status, headers });
+}
+
+async function authenticate(request: Request, env: Env): Promise<{ id: string } | null> {
+  const authorization = request.headers.get("Authorization");
+  if (!authorization?.startsWith("Bearer ") || !env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) return null;
+  const token = authorization.slice("Bearer ".length).trim();
+  if (!token) return null;
+  return verifySupabaseUser(token, env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+}
+
+async function handleCharacterRequest(request: Request, env: Env, userId: string): Promise<Response> {
+  if (!env.HYPERDRIVE) {
+    return corsJson({ error: "Database is not configured. Bind Neon through Cloudflare Hyperdrive." }, 503, env);
+  }
+  const sql = postgres(env.HYPERDRIVE.connectionString, {
+    max: 1,
+    idle_timeout: 5,
+    connect_timeout: 10,
+    fetch_types: false
+  });
+  try {
+    if (request.method === "GET") {
+      const rows = await sql`SELECT id::text AS id, display_name, region_id, x, y, health, gold
+        FROM characters WHERE user_id = ${userId}::uuid ORDER BY created_at ASC LIMIT 1`;
+      return corsJson({ character: rows[0] ?? null }, 200, env);
+    }
+    let body: { displayName?: unknown };
+    try {
+      body = await request.json() as { displayName?: unknown };
+    } catch {
+      return corsJson({ error: "Request body must be valid JSON" }, 400, env);
+    }
+    const displayName = typeof body.displayName === "string" ? body.displayName.trim() : "";
+    if (!/^[A-Za-z][A-Za-z0-9 _-]{1,19}$/.test(displayName)) {
+      return corsJson({ error: "Name must be 2–20 characters and use letters, numbers, spaces, _ or -." }, 400, env);
+    }
+    const character = await sql.begin(async (tx) => {
+      await tx`INSERT INTO accounts (user_id) VALUES (${userId}::uuid) ON CONFLICT (user_id) DO NOTHING`;
+      const existing = await tx`SELECT id::text AS id, display_name, region_id, x, y, health, gold
+        FROM characters WHERE user_id = ${userId}::uuid ORDER BY created_at ASC LIMIT 1`;
+      if (existing[0]) return existing[0];
+      const created = await tx`INSERT INTO characters (user_id, display_name)
+        VALUES (${userId}::uuid, ${displayName})
+        RETURNING id::text AS id, display_name, region_id, x, y, health, gold`;
+      const characterId = created[0].id as string;
+      await tx`INSERT INTO character_skills (character_id, skill_id, xp) VALUES
+        (${characterId}::uuid, 'adventuring', 0),
+        (${characterId}::uuid, 'farming', 0),
+        (${characterId}::uuid, 'combat', 0)
+        ON CONFLICT (character_id, skill_id) DO NOTHING`;
+      await tx`INSERT INTO inventory_items (character_id, item_id, quantity) VALUES
+        (${characterId}::uuid, 'turnip_seed', 3),
+        (${characterId}::uuid, 'turnip', 0),
+        (${characterId}::uuid, 'slime_gel', 0)
+        ON CONFLICT (character_id, item_id) DO NOTHING`;
+      return created[0];
+    });
+    return corsJson({ character }, 200, env);
+  } catch (error) {
+    // Do not return SQL details or connection strings to clients.
+    return corsJson({ error: "Could not load or create the character." }, 500, env);
+  } finally {
+    await sql.end({ timeout: 1 });
+  }
+}
 
 async function verifySupabaseUser(
   accessToken: string,
