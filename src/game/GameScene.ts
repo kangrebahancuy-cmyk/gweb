@@ -338,11 +338,11 @@ export class GameScene extends Phaser.Scene {
     g.fillStyle(0x14241c, 0.45).fillCircle(bx, by, 48);
     g.lineStyle(3, 0xe9d9aa, 0.6).strokeCircle(bx, by, 48);
     g.fillStyle(0xe9d9aa, 0.6).fillCircle(kx, ky, 21);
-    this.drawTouchButton(w - 75, h - 75, "E", 0x486c45);
-    this.drawTouchButton(w - 145, h - 145, "⚔", 0x8d4b3e);
+    this.drawTouchButton(w - 75, h - 75, 0x486c45);
+    this.drawTouchButton(w - 145, h - 145, 0x8d4b3e);
   }
 
-  private drawTouchButton(x: number, y: number, label: string, color: number): void {
+  private drawTouchButton(x: number, y: number, color: number): void {
     this.touchGraphics.fillStyle(0x14241c, 0.55).fillCircle(x, y, 30);
     this.touchGraphics.fillStyle(color, 0.9).fillCircle(x, y, 24);
     this.touchGraphics.lineStyle(2, 0xe9d9aa, 0.9).strokeCircle(x, y, 24);
