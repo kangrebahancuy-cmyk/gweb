@@ -109,6 +109,7 @@ export class GameScene extends Phaser.Scene {
     this.load.spritesheet("slime-death-sheet", "/assets/game/PNG/Slime1/Without_shadow/Slime1_Death_without_shadow.png", { frameWidth: 64, frameHeight: 64 });
     this.load.image("farm-terrain", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_terrain_summer_expanded.png");
     this.load.image("farm-buildings", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_buildings.png");
+    this.load.image("farm-produce", "/assets/game/Vegetables.png");
   }
 
   create(): void {
@@ -206,6 +207,8 @@ export class GameScene extends Phaser.Scene {
       if (!buildings.has("barn")) buildings.add("barn", 0, 96, 64, 96, 96);
       if (!buildings.has("small-house")) buildings.add("small-house", 0, 64, 192, 64, 64);
     }
+    const produce = this.textures.get("farm-produce");
+    if (produce && !produce.has("radish")) produce.add("radish", 0, 96, 64, 32, 32);
   }
 
   private createAssetAnimations(): void {
@@ -314,7 +317,7 @@ export class GameScene extends Phaser.Scene {
       stroke: "#38432a", strokeThickness: 4
     }).setOrigin(0.5).setDepth(25);
     npc.setName("mira");
-    this.add.sprite(1415, 440, "starter-atlas", "turnip").setDisplaySize(24, 24).setDepth(18);
+    this.add.sprite(1415, 440, "farm-produce", "radish").setDisplaySize(24, 24).setDepth(18);
     this.add.text(1415, 463, "Market", {
       fontFamily: "monospace", fontSize: "11px", color: "#fff3c9",
       stroke: "#38432a", strokeThickness: 3
