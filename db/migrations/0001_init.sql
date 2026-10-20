@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS characters (
   UNIQUE (user_id, display_name)
 );
 CREATE INDEX IF NOT EXISTS characters_region_idx ON characters(region_id);
+CREATE UNIQUE INDEX IF NOT EXISTS characters_one_per_account_idx ON characters(user_id);
 
 CREATE TABLE IF NOT EXISTS character_skills (
   character_id uuid NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
