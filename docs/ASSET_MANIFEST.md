@@ -6,7 +6,7 @@ The owner supplied four ZIP archives in the project conversation. A compact 128�
 |---|---|---|---|---|
 | `player` | Pixel Art Character | `PNG/Boy  sheet wlaking and Idle.png` | Starter character portrait/sprite frame | Cropped from first 64×64 cell; full animation sheet not yet wired |
 | `slime` | Free Slime Mobs | `PNG/Slime1/Without_shadow/Slime1_Idle_without_shadow.png` | First hostile creature | Cropped from first 64×64 cell; animation and AI polish pending |
-| `turnip` | Farming Set | `farming set opengameart/Vegetables.png` | Produce icon | Cropped 32×32 icon sample |
+| `turnip` | Farming Set | `farming set opengameart/Vegetables.png` | Root-vegetable stand-in for the prototype turnip | Cropped 32×32 radish-like icon; not a verified turnip sprite |
 | `grass` | Farming Sim Asset Pack | `ReColor/16x16/Tilesets (Compact)/vectoraith_tileset_farmingsims_terrains_recolor.png` | Terrain texture sample | Cropped 16×16 patch and enlarged with nearest-neighbor |
 
 The current map uses original Phaser-drawn terrain, paths, trees, and building silhouettes. Do not claim those shapes are part of a downloaded pack. The complete source archives are not committed to the public website.
