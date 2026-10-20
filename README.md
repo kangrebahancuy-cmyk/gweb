@@ -1,24 +1,25 @@
 # Elder Realms Online
 
-An original browser-based 3D open-world MMORPG project. The design takes inspiration from broad MMORPG systems—open exploration, skill progression, quests, combat, crafting, trading, and social play—without copying another game's code, lore, writing, models, or visual identity.
+Elder Realms Online is an original 2D pixel-art farming-adventure MMORPG project. It combines cozy farming, exploration, gathering, quests, and combat with a roadmap toward authoritative multiplayer. It takes inspiration from broad genre conventions without copying another game's maps, writing, lore, art direction, or code.
 
-## Current status
+## Current milestone
 
-**Phase 1: repository foundation.** This repository started empty. The initial application establishes a responsive project entry page and a strict TypeScript/Next.js base. It is not yet a playable MMORPG.
+**Playable local prototype in progress.** The repository now uses Vite, React, TypeScript, and Phaser 3. The first playable slice includes a scrollable village/farm area, desktop movement, touch joystick, NPC interaction, planting and harvesting, a starter quest, slime combat, inventory/skills/quest panels, and local prototype save data.
 
-## Technology direction
+The current browser prototype is **not yet an online MMORPG**: gameplay saves are local to the browser, and authentication, Neon persistence, and Cloudflare multiplayer still require configuration and implementation. Do not treat localStorage state or client-side rewards as secure production game data.
 
-- Web client: Next.js App Router, React, TypeScript
-- 3D rendering: Three.js, React Three Fiber, Drei
-- Client presentation state: Zustand
-- Multiplayer: persistent Node.js/TypeScript server with WebSocket and Colyseus (planned)
-- Persistence: PostgreSQL with migrations and a typed ORM (planned)
-- Frontend hosting: Vercel-compatible; the authoritative game server must run on persistent infrastructure
-- Docker is not required
+## Stack
+
+- Frontend: Vite, React, TypeScript
+- Game runtime: Phaser 3 / Canvas
+- UI state: React; Zustand is available for later shared UI state
+- Planned multiplayer: Cloudflare Workers + Durable Objects + WebSockets
+- Planned identity: Supabase Auth
+- Planned persistence: Neon PostgreSQL with versioned SQL migrations
 
 ## Requirements
 
-- Node.js 20.9 or newer
+- Node.js 20+
 - npm
 
 ## Local development
@@ -28,31 +29,48 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000.
+Open the URL Vite prints (normally http://localhost:5173).
 
-## Validation
+## Quality checks
 
 ```bash
 npm run typecheck
 npm run lint
+npm test
 npm run build
 ```
 
-These commands must be run in an environment with dependencies installed. A GitHub file write alone does not prove that checks pass.
+A GitHub edit is not proof that these commands pass. Run them in a local or CI environment with dependencies installed.
 
-## Environment variables
+## Controls
 
-No secrets are needed for the current project entry page. Before adding backend integrations, document required variables in `.env.example`. Never commit real credentials, database URLs, private keys, or server tokens.
+- **WASD / arrow keys:** move
+- **E:** interact with nearby NPCs, crops, and objects
+- **Space:** attack a nearby slime
+- **I:** inventory
+- **K:** skills
+- **J:** quest journal
+- **Esc:** close the active panel
+- **Touch:** use the on-screen joystick and action buttons
+
+## Assets
+
+The starter atlas is derived from the four user-supplied ZIP archives. It contains small cropped samples from the Pixel Art Character, Free Slime Mobs, Farming Set, and Farming Sim packs. The original ZIPs are not copied wholesale into the public site. See [docs/ASSET_MANIFEST.md](docs/ASSET_MANIFEST.md) and [docs/ASSET_CREDITS.md](docs/ASSET_CREDITS.md) for provenance and remaining license checks.
+
+## Security and deployment status
+
+No production credentials are committed. The Worker and SQL files are infrastructure starting points, not a claim that cloud services have been provisioned. Set secrets through the provider's secret manager, apply migrations to a configured Neon database, and complete server-authoritative validation before exposing multiplayer or economy features to real players.
 
 ## Roadmap
 
-1. **Foundation:** application structure, quality gates, design system, documentation.
-2. **Playable single-player slice:** original procedural 3D starter region, character movement, collision, camera controls, responsive touch controls.
-3. **Authoritative multiplayer:** persistent game server, session/authentication boundary, synchronized player movement, reconnect handling.
-4. **Persistence:** schema and migrations for accounts, characters, inventories, skills, quest state, and safe item transactions.
-5. **Core gameplay:** server-validated gathering, XP/levels, items, equipment, combat, NPCs, and a complete starter quest.
-6. **World and social systems:** additional regions, crafting, trading, parties, chat, guilds, PvE encounters, and controlled PvP.
-7. **Content expansion:** reusable data-driven skill modules, quests, bosses, raids, minigames, economy balancing, and original assets.
-8. **Release hardening:** automated tests, abuse prevention, observability, performance budgets, accessibility, Android browser QA, and deployment runbooks.
+1. **Playable local slice:** core Phaser scene, desktop/touch controls, farming, inventory, quest, and a first enemy.
+2. **Verified asset integration:** inspect licenses and frame layouts, expand atlas/manifest, add animation and tilemap support.
+3. **Cloud services:** Supabase Auth, Neon migrations, Cloudflare Worker and Durable Object room.
+4. **Authoritative gameplay:** server-side movement validation, farming timers, combat, XP, loot, and inventory transactions.
+5. **Persistent multiplayer:** character load/save, room synchronization, reconnects, abuse prevention, and two-client tests.
+6. **Core MMORPG content:** gathering skills, crafting, equipment, quests, trading, social systems, and additional regions.
+7. **Release hardening:** automated browser tests, performance budgets, backups, moderation, accessibility, and deployment runbooks.
 
-Every phase must be validated before it is described as complete. Features affecting persistent state or other players must be validated by the server.
+## Originality
+
+Use original names, quests, maps, dialogue, game rules, and any newly created artwork. Respect each imported pack's license and attribution terms before public release.
