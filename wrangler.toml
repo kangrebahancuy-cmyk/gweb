@@ -1,6 +1,7 @@
 name = "elder-realms-game"
 main = "workers/index.ts"
 compatibility_date = "2026-10-20"
+compatibility_flags = ["nodejs_compat"]
 
 [vars]
 # Set this to the Supabase project URL before deployment.
@@ -16,3 +17,9 @@ new_sqlite_classes = ["GameRoom"]
 
 # Configure credentials through the Cloudflare secret manager.
 # This worker is a starting point, not a completed production deployment.
+
+# After creating a Hyperdrive configuration for your Neon database, uncomment
+# the binding below and replace the placeholder with its real configuration ID.
+# [[hyperdrive]]
+# binding = "HYPERDRIVE"
+# id = "YOUR_HYPERDRIVE_CONFIG_ID"
