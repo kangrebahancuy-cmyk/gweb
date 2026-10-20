@@ -12,6 +12,8 @@ Updated: 2026-10-20
 - One slime combat loop with health, rewards, and timed respawn.
 - Inventory, skills, and quest UI panels.
 - Unit tests for small shared gameplay rules.
+- Supabase email/password sign-up, sign-in, sign-out, and session handling when the public environment variables are configured.
+- Authenticated character GET/create API backed by Neon through an optional Cloudflare Hyperdrive binding.
 - Initial Neon schema migration and a Cloudflare Worker/Durable Object WebSocket starting point.
 - GitHub Actions CI workflow.
 
@@ -19,11 +21,11 @@ Updated: 2026-10-20
 
 - The imported sprite atlas uses cropped frames from supplied ZIPs; full sprite sheets and animation sequences are not yet integrated.
 - The world map uses original Phaser-drawn shapes; a complete tilemap from the supplied terrain/building tilesets is still pending.
-- The Worker calls Supabase Auth to validate access tokens, but character ownership verification against Neon and server-authoritative simulation are not implemented yet.
+- The Worker validates Supabase sessions and supports character creation/lookup when Hyperdrive is configured. The WebSocket room still does not verify character ownership or run authoritative movement/combat simulation.
 - The SQL migration has been authored but not applied to a Neon database.
-- Supabase, Neon, Cloudflare, and production domains have not been configured.
+- Supabase, Neon, Cloudflare, Hyperdrive, and production domains have not been configured. The Hyperdrive binding is intentionally commented until a real configuration ID exists.
 - The local browser prototype uses localStorage and is not safe for production economy or persistent multiplayer.
-- No test/build result is claimed until checks run in CI or a local environment.
+- No test/build result is claimed until checks run in CI or a local environment. A package lockfile still needs to be generated with npm install in an environment with registry access.
 
 ## Next acceptance tests
 
