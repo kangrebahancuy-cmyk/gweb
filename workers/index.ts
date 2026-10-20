@@ -112,9 +112,7 @@ async function handleCharacterRequest(request: Request, env: Env, userId: string
         (${characterId}::uuid, 'combat', 0)
         ON CONFLICT (character_id, skill_id) DO NOTHING`;
       await tx`INSERT INTO inventory_items (character_id, item_id, quantity) VALUES
-        (${characterId}::uuid, 'turnip_seed', 3),
-        (${characterId}::uuid, 'turnip', 0),
-        (${characterId}::uuid, 'slime_gel', 0)
+        (${characterId}::uuid, 'turnip_seed', 3)
         ON CONFLICT (character_id, item_id) DO NOTHING`;
       return created[0];
     });
