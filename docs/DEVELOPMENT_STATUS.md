@@ -19,8 +19,8 @@ Updated: 2026-10-20
 
 ## Partial / not yet verified
 
-- The imported sprite atlas uses cropped frames from supplied ZIPs; full sprite sheets and animation sequences are not yet integrated.
-- The world map uses original Phaser-drawn shapes; a complete tilemap from the supplied terrain/building tilesets is still pending.
+- Initial original asset integration is in progress: the 64×64-frame player sheet is loaded, Slime 1 idle/walk/attack/hurt/death animations are wired, the Farming Sim terrain tile is used for ground, three building crops are displayed, and the Farming Set radish-like crop is used at the market.
+- The world still uses hand-drawn paths, trees, pond, farm plots, and crop growth visuals; a complete tilemap and player movement/directional animations remain pending. Sprite crop boundaries need in-game visual QA.
 - The Worker validates Supabase sessions and supports character creation/lookup when Hyperdrive is configured. The WebSocket room still does not verify character ownership or run authoritative movement/combat simulation.
 - The SQL migration has been authored but not applied to a Neon database.
 - Supabase, Neon, Cloudflare, Hyperdrive, and production domains have not been configured. The Hyperdrive binding is intentionally commented until a real configuration ID exists.
