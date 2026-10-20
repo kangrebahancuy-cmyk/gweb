@@ -97,6 +97,11 @@ export class GameScene extends Phaser.Scene {
 
   preload(): void {
     this.load.image("starter-atlas", STARTER_ATLAS_DATA_URI);
+    this.load.spritesheet(
+      "player-sheet",
+      "/assets/game/Pixel%20Art%20Character-TheGameAssetsMine-/PNG/Boy%20%20sheet%20wlaking%20and%20Idle.png",
+      { frameWidth: 64, frameHeight: 64 }
+    );
     this.load.spritesheet("slime-idle-sheet", "/assets/game/PNG/Slime1/Without_shadow/Slime1_Idle_without_shadow.png", { frameWidth: 64, frameHeight: 64 });
     this.load.spritesheet("slime-walk-sheet", "/assets/game/PNG/Slime1/Without_shadow/Slime1_Walk_without_shadow.png", { frameWidth: 64, frameHeight: 64 });
     this.load.spritesheet("slime-attack-sheet", "/assets/game/PNG/Slime1/Without_shadow/Slime1_Attack_without_shadow.png", { frameWidth: 64, frameHeight: 64 });
@@ -117,7 +122,7 @@ export class GameScene extends Phaser.Scene {
     this.obstacles = this.physics.add.staticGroup();
     this.createWorldObjects();
 
-    this.player = this.physics.add.sprite(330, 350, "starter-atlas", "player");
+    this.player = this.physics.add.sprite(330, 350, "player-sheet", 0);
     this.player.setDepth(20);
     this.player.setDisplaySize(48, 48);
     this.player.setCollideWorldBounds(true);
@@ -304,7 +309,7 @@ export class GameScene extends Phaser.Scene {
       this.physics.add.existing(block, true);
       this.obstacles.add(block);
     });
-    const npc = this.add.sprite(420, 345, "starter-atlas", "player")
+    const npc = this.add.sprite(420, 345, "player-sheet", 0)
       .setDisplaySize(40, 40).setTint(0xf4cf82).setDepth(18);
     this.add.text(420, 312, "Mira", {
       fontFamily: "monospace", fontSize: "13px", color: "#fff3c9",
