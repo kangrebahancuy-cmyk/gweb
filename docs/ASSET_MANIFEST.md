@@ -17,7 +17,7 @@ The supplied asset packs are under `public/assets/game/`. The Phaser scene now m
 
 | Atlas frame | Source | Intended use | Status |
 |---|---|---|---|
-| `player` | Pixel Art Character PNG | Player and Mira | Original sheet is loaded; frame 0 is used pending verified animation mapping |
+| `player` | Pixel Art Character PNG | Player and Mira | Player uses row 0 for directional idle and rows 1–3 for direction-specific walk cycles; Mira uses the front-facing frame |
 | `slime` | Slime 1 idle PNG without shadow | Hostile creature | Legacy atlas crop remains unused by the animated slime |
 | `turnip` | Farming Set vegetable sheet | Harvest and inventory icon | Uses a 32×32 radish-like sprite as a visual stand-in; the source art is not positively identified as a turnip |
 | `grass` | Farming Sim terrain tileset | Terrain texture | Runtime uses the original tileset's top-left 16×16 tile |
@@ -25,7 +25,7 @@ The supplied asset packs are under `public/assets/game/`. The Phaser scene now m
 | `tree-green`, `tree-fruit`, `tree-blossom` | Farming Sim orchard tileset | Orchard scenery | Original 32×32 tree frames are placed around the village; scale/positions need browser visual QA |
 | `sprout`, `young-crop` | Farming Sim crops tileset | Crop growth stages | Sprout/young plant frames display while plots grow; ripe crop uses the vegetable sheet |
 
-The map's current paths, trees, buildings and other scenery are drawn by the game code; they should not be represented as imported artwork from these packs.
+The current map combines imported terrain, building, orchard, details, and crop sprites with code-drawn paths, pond, labels, and collision zones. The code-drawn pieces should not be represented as imported artwork from these packs.
 
 ## Integration plan
 
