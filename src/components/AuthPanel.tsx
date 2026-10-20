@@ -38,7 +38,7 @@ export default function AuthPanel({ onClose }: AuthPanelProps) {
         if (!response.ok) throw new Error(data.error || "Could not load character.");
         if (!cancelled) {
           setCharacter(data.character ?? null);
-          setCharacterName(data.character?.display_name ?? (session.user.user_metadata.display_name as string) ?? "");
+          setCharacterName(data.character?.display_name ?? String(session.user.user_metadata.display_name ?? ""));
         }
       })
       .catch((error: unknown) => {
