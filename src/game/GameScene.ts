@@ -85,6 +85,8 @@ export class GameScene extends Phaser.Scene {
   private joystickKnob = new Phaser.Math.Vector2(0, 0);
   private touchGraphics!: Phaser.GameObjects.Graphics;
   private cropGraphics!: Phaser.GameObjects.Graphics;
+  private plotSprites = new Map<number, Phaser.GameObjects.Sprite>();
+  private playerFacing: "down" | "up" | "left" | "right" = "down";
   private obstacles!: Phaser.Physics.Arcade.StaticGroup;
   private onUiActionBound = (event: Event) => {
     const custom = event as CustomEvent<string>;
@@ -109,7 +111,9 @@ export class GameScene extends Phaser.Scene {
     this.load.spritesheet("slime-death-sheet", "/assets/game/PNG/Slime1/Without_shadow/Slime1_Death_without_shadow.png", { frameWidth: 64, frameHeight: 64 });
     this.load.image("farm-terrain", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_terrain_summer_expanded.png");
     this.load.image("farm-buildings", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_buildings.png");
-    this.load.image("farm-produce", "/assets/game/Vegetables.png");
+    this.load.spritesheet("farm-produce", "/assets/game/Vegetables.png", { frameWidth: 32, frameHeight: 32 });
+    this.load.image("farm-crops", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_crops.png");
+    this.load.spritesheet("farm-seeds", "/assets/game/Seeds_Cereals.png", { frameWidth: 32, frameHeight: 32 });
   }
 
   create(): void {
@@ -121,12 +125,14 @@ export class GameScene extends Phaser.Scene {
     this.createAssetAnimations();
     this.drawWorld();
     this.cropGraphics = this.add.graphics().setDepth(12);
+    this.createPlotSprites();
     this.obstacles = this.physics.add.staticGroup();
     this.createWorldObjects();
 
-    this.player = this.physics.add.sprite(330, 350, "player-sheet", 0);
+    this.player = this.physics.add.sprite(330, 350, "player-sheet", 2);
     this.player.setDepth(20);
     this.player.setDisplaySize(48, 48);
+    this.player.play("player-idle-down");
     this.player.setCollideWorldBounds(true);
     const body = this.player.body as Phaser.Physics.Arcade.Body;
     body.setSize(24, 24);
@@ -169,8 +175,15 @@ export class GameScene extends Phaser.Scene {
     if (vector.length() > 1) vector.normalize();
     this.player.setVelocity(vector.x * speed, vector.y * speed);
     if (vector.lengthSq() > 0.02) {
-      this.player.setFlipX(vector.x < -0.05);
+      if (Math.abs(vector.x) > Math.abs(vector.y)) {
+        this.playerFacing = vector.x < 0 ? "left" : "right";
+      } else {
+        this.playerFacing = vector.y < 0 ? "up" : "down";
+      }
       this.player.setAngle(0);
+      this.player.play(`player-walk-${this.playerFacing}`, true);
+    } else {
+      this.player.play(`player-idle-${this.playerFacing}`, true);
     }
 
     if (Phaser.Input.Keyboard.JustDown(this.keys.E)) this.interact();
@@ -201,14 +214,20 @@ export class GameScene extends Phaser.Scene {
     if (!texture.has("grass")) texture.add("grass", 0, 32, 64, 32, 32);
     const terrain = this.textures.get("farm-terrain");
     if (terrain && !terrain.has("grass-tile")) terrain.add("grass-tile", 0, 0, 0, 16, 16);
+    if (terrain && !terrain.has("soil-bed")) terrain.add("soil-bed", 0, 32, 0, 32, 32);
     const buildings = this.textures.get("farm-buildings");
     if (buildings) {
       if (!buildings.has("farmhouse")) buildings.add("farmhouse", 0, 0, 0, 64, 64);
-      if (!buildings.has("barn")) buildings.add("barn", 0, 96, 64, 96, 96);
+      if (!buildings.has("barn")) buildings.add("barn", 0, 96, 32, 128, 112);
       if (!buildings.has("small-house")) buildings.add("small-house", 0, 64, 192, 64, 64);
     }
     const produce = this.textures.get("farm-produce");
     if (produce && !produce.has("radish")) produce.add("radish", 0, 96, 64, 32, 32);
+    const crops = this.textures.get("farm-crops");
+    if (crops) {
+      if (!crops.has("sprout")) crops.add("sprout", 0, 0, 0, 16, 16);
+      if (!crops.has("young-crop")) crops.add("young-crop", 0, 32, 0, 16, 16);
+    }
   }
 
   private createAssetAnimations(): void {
@@ -220,13 +239,54 @@ export class GameScene extends Phaser.Scene {
       ["slime-death", "slime-death-sheet", 9, 12, 0]
     ] as const;
     for (const [key, texture, end, frameRate, repeat] of specs) {
-      if (this.anims.exists(key)) continue;
-      this.anims.create({
-        key,
-        frames: this.anims.generateFrameNumbers(texture, { start: 0, end }),
-        frameRate,
-        repeat
-      });
+      if (!this.anims.exists(key)) {
+        this.anims.create({
+          key,
+          frames: this.anims.generateFrameNumbers(texture, { start: 0, end }),
+          frameRate,
+          repeat
+        });
+      }
+    }
+
+    // The supplied 640×640 character sheet is a 10×10 grid. Its first row
+    // contains directional idle poses; rows 1–3 provide the walk cycle poses.
+    const directions = [
+      { key: "left", column: 0, idle: 0 },
+      { key: "up", column: 1, idle: 1 },
+      { key: "down", column: 2, idle: 2 },
+      { key: "right", column: 3, idle: 3 }
+    ] as const;
+    for (const direction of directions) {
+      const idleKey = `player-idle-${direction.key}`;
+      if (!this.anims.exists(idleKey)) {
+        this.anims.create({
+          key: idleKey,
+          frames: [{ key: "player-sheet", frame: direction.idle }],
+          frameRate: 1,
+          repeat: -1
+        });
+      }
+      const walkKey = `player-walk-${direction.key}`;
+      if (!this.anims.exists(walkKey)) {
+        this.anims.create({
+          key: walkKey,
+          frames: [10 + direction.column, 20 + direction.column, 30 + direction.column]
+            .map((frame) => ({ key: "player-sheet", frame })),
+          frameRate: 8,
+          repeat: -1
+        });
+      }
+    }
+  }
+
+  private createPlotSprites(): void {
+    for (const plot of this.save.plots) {
+      const sprite = this.add.sprite(plot.x, plot.y - 8, "farm-crops", "sprout")
+        .setDisplaySize(30, 30)
+        .setDepth(14)
+        .setVisible(false);
+      this.plotSprites.set(plot.id, sprite);
     }
   }
 
@@ -250,8 +310,9 @@ export class GameScene extends Phaser.Scene {
     // Farmyard, beds, and a small pond.
     g.fillStyle(0x9a7a4e, 1).fillRoundedRect(450, 390, 145, 135, 10);
     for (const plot of this.save.plots) {
-      g.fillStyle(0x5d422d, 1).fillRoundedRect(plot.x - 22, plot.y - 18, 44, 36, 4);
-      g.lineStyle(2, 0x392c20, 0.55).strokeRoundedRect(plot.x - 22, plot.y - 18, 44, 36, 4);
+      this.add.image(plot.x, plot.y, "farm-terrain", "soil-bed")
+        .setDisplaySize(44, 36).setDepth(-98);
+      g.lineStyle(2, 0x392c20, 0.45).strokeRoundedRect(plot.x - 22, plot.y - 18, 44, 36, 4);
     }
     g.fillStyle(0x5e9e9b, 1).fillEllipse(870, 935, 190, 112);
     g.lineStyle(8, 0xc9d6a1, 1).strokeEllipse(870, 935, 190, 112);
@@ -260,7 +321,7 @@ export class GameScene extends Phaser.Scene {
     this.add.image(285, 235, "farm-buildings", "farmhouse")
       .setDisplaySize(150, 135).setDepth(-90);
     this.add.image(760, 255, "farm-buildings", "barn")
-      .setDisplaySize(150, 150).setDepth(-90);
+      .setDisplaySize(190, 165).setDepth(-90);
     this.add.image(1425, 345, "farm-buildings", "small-house")
       .setDisplaySize(130, 120).setDepth(-90);
 
@@ -310,14 +371,14 @@ export class GameScene extends Phaser.Scene {
       this.physics.add.existing(block, true);
       this.obstacles.add(block);
     });
-    const npc = this.add.sprite(420, 345, "player-sheet", 0)
+    const npc = this.add.sprite(420, 345, "player-sheet", 2)
       .setDisplaySize(40, 40).setTint(0xf4cf82).setDepth(18);
     this.add.text(420, 312, "Mira", {
       fontFamily: "monospace", fontSize: "13px", color: "#fff3c9",
       stroke: "#38432a", strokeThickness: 4
     }).setOrigin(0.5).setDepth(25);
     npc.setName("mira");
-    this.add.sprite(1415, 440, "farm-produce", "radish").setDisplaySize(24, 24).setDepth(18);
+    this.add.sprite(1415, 440, "farm-produce", 11).setDisplaySize(28, 28).setDepth(18);
     this.add.text(1415, 463, "Market", {
       fontFamily: "monospace", fontSize: "11px", color: "#fff3c9",
       stroke: "#38432a", strokeThickness: 3
@@ -477,18 +538,20 @@ export class GameScene extends Phaser.Scene {
 
   private updatePlots(): void {
     const now = Date.now();
-    const g = this.cropGraphics;
-    g.clear();
     this.save.plots.forEach((plot) => {
-      if (plot.plantedAt === null) return;
-      const grown = now - plot.plantedAt >= CROP_GROW_MS;
-      g.fillStyle(grown ? 0x5c9d38 : 0x567d32, 1).fillRoundedRect(plot.x - 10, plot.y - 12, 20, 24, 4);
-      if (grown) {
-        g.fillStyle(0xe2c96f, 1).fillCircle(plot.x, plot.y - 4, 8);
-        g.fillStyle(0x6b8e3c, 1).fillEllipse(plot.x - 6, plot.y - 10, 12, 5);
-      } else {
-        g.fillStyle(0x8ebd5b, 1).fillEllipse(plot.x, plot.y - 7, 12, 6);
+      const sprite = this.plotSprites.get(plot.id);
+      if (!sprite) return;
+      if (plot.plantedAt === null) {
+        sprite.setVisible(false);
+        return;
       }
+      const grown = now - plot.plantedAt >= CROP_GROW_MS;
+      if (grown) {
+        sprite.setTexture("farm-produce", 11).setDisplaySize(32, 32);
+      } else {
+        sprite.setTexture("farm-crops", "young-crop").setDisplaySize(30, 30);
+      }
+      sprite.setVisible(true);
     });
   }
 
