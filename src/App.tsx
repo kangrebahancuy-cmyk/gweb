@@ -160,7 +160,17 @@ export default function App() {
               <div className="health-wrap"><span>HP</span><div className="health-track"><i style={{ width: `${state.health}%` }} /></div><b>{state.health}/100</b></div>
               <div className="gold-counter">◈ <b>{state.gold}</b> <small>GOLD</small></div>
             </div>
-            <div id="game-root" className="game-root" aria-label="Playable game world" />
+            <div id="game-root" className="game-root" aria-label="Playable game world" />\n            <div className="mini-map" aria-label="Village minimap" title="Fernhollow minimap">
+              <span className="map-compass">N</span>
+              <div className="map-water" />
+              <div className="map-road map-road-main" />
+              <div className="map-road map-road-cross" />
+              <i className="map-tree t1" /><i className="map-tree t2" /><i className="map-tree t3" /><i className="map-tree t4" /><i className="map-tree t5" /><i className="map-tree t6" />
+              <i className="map-house h1" /><i className="map-house h2" /><i className="map-house h3" /><i className="map-house h4" />
+              <i className="map-player" title="You are here" />
+              <span className="map-location">FERNHOLLOW</span>
+            </div>
+
             <div className="game-bottom-hud">
               <div className="location-chip"><span>⌖</span> Fernhollow Village</div>
               <div className="controls-hint">WASD MOVE <i /> E INTERACT <i /> SPACE ATTACK</div>
