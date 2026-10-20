@@ -102,3 +102,113 @@ body{
  .game-top-hud{gap:7px}
  .gold-counter{padding:6px}
 }
+
+
+/* Full-screen classic MMORPG layout inspired by the supplied reference. */
+html,body,#root{width:100%;height:100%;min-height:100%;overflow:hidden}
+body{background:#11150f}
+.app-shell{width:100%;height:100dvh;max-width:none;margin:0;padding:0;overflow:hidden;position:relative}
+.topbar{position:absolute;left:12px;top:10px;z-index:12;height:0;width:calc(100% - 24px);border:0;pointer-events:none}
+.brand{display:none}
+.realm-status{display:none}
+.header-actions{pointer-events:auto;position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:18}
+.header-actions .account-button{display:none}
+.header-actions .help-button{background:#f4e5bf;color:#352817;border:2px solid #76572e;border-radius:7px;box-shadow:0 2px 0 #4b3822;font-weight:800}
+.game-layout{display:block;padding:0;margin:0;width:100%;height:100%;position:relative}
+.world-column{position:absolute;inset:0;min-width:0}
+.game-frame{position:absolute;inset:0;width:100%;height:100%;min-height:0;border:0;border-radius:0;box-shadow:none;overflow:hidden}
+.game-root{position:absolute;inset:0}
+.game-root canvas{image-rendering:pixelated}
+.game-top-hud{left:12px;top:10px;right:auto;width:min(290px,calc(100vw - 24px));height:auto;min-height:104px;display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#fff1d5f5;color:#372a1b;border:3px solid #6d4b24;border-radius:10px;box-shadow:0 3px 0 #2e2417,0 8px 24px #0005;pointer-events:auto}
+.player-badge{min-width:0;width:100%;gap:9px}
+.player-avatar{width:44px;height:44px;flex:none;border:2px solid #75552d;border-radius:6px;background:#d9bd7d}
+.player-badge b{color:#302519;font-family:Georgia,serif;font-size:16px}
+.player-badge small{color:#6f532f;font: bold 10px Manrope,sans-serif}
+.health-wrap{max-width:none;width:100%;flex:1 1 100%;color:#47321e;gap:6px}
+.health-wrap>span{width:18px;font-weight:900}
+.health-track{height:12px;border:2px solid #674a2a;background:#4c3324;border-radius:4px}
+.health-track i{background:linear-gradient(#ff8c6e,#bf382b)}
+.health-wrap>b{font-size:10px;color:#392519}
+.gold-counter{margin:0 0 0 auto;padding:5px 8px;background:#e4c77e;border:1px solid #76562d;border-radius:5px;color:#533b1f}
+.gold-counter small{color:#533b1f}
+.game-bottom-hud{left:12px;right:auto;bottom:12px;width:min(430px,calc(100vw - 24px));min-height:32px;padding:8px 12px;background:#172b20ed;border:2px solid #76552c;border-radius:6px;justify-content:flex-start;gap:12px;box-shadow:0 3px 0 #211b12}
+.location-chip{font-size:11px}
+.controls-hint{display:none}
+.message-toast{top:16px;left:50%;max-width:min(520px,calc(100vw - 330px));background:#fff0ce;border:2px solid #79562b;border-radius:7px;color:#392819;font-weight:700}
+.quickbar{position:fixed;z-index:15;top:14px;right:12px;bottom:auto;width:142px;display:flex;flex-direction:column;align-items:stretch;gap:5px;padding:0;border:0}
+.quickbar button{min-height:39px;justify-content:flex-start;padding:8px 10px;background:#f6e6c5;border:2px solid #76552e;border-radius:7px;color:#352719;box-shadow:0 2px 0 #392819;font-weight:800;font-size:11px}
+.quickbar button>span{color:#5b762f;font-size:17px}
+.quickbar button.selected,.quickbar button:hover{background:#e3c77f;border-color:#49341f;color:#241b12}
+.quickbar kbd{margin-left:auto;color:#59432b;border-color:#b39a6b}
+.quickbar-spacer{display:none}
+.save-indicator{position:fixed;top:12px;left:12px;transform:translateY(114px);padding:5px 8px;background:#fff0cf;border:1px solid #76552e;border-radius:5px;color:#49351f}
+.side-column{position:static;display:block}
+.profile-card{position:fixed;z-index:11;top:132px;left:12px;width:min(290px,calc(100vw - 24px));padding:12px 14px;background:#fff0d3f2;border:3px solid #76532a;border-radius:9px;color:#352719;box-shadow:0 3px 0 #332415,0 8px 20px #0004}
+.profile-card:before{display:none}
+.profile-card .eyebrow{color:#8c5e2c}
+.profile-card .rank-pill{color:#5d4225;border-color:#a17c43}
+.profile-card h2{color:#3c2918;font-size:19px;margin:8px 0}
+.profile-card p{color:#533c26;font-size:10px;line-height:1.5}
+.profile-stats{border-color:#c4a877;margin-top:10px;padding-top:8px}
+.profile-stats span{color:#87663e}
+.profile-stats b{color:#4b702b;font-size:16px}
+.quest-summary{position:fixed;z-index:11;left:12px;top:calc(132px + 190px);width:min(290px,calc(100vw - 24px));padding:13px 14px;background:#fff0d3f2;border:3px solid #76532a;border-radius:9px;color:#352719;box-shadow:0 3px 0 #332415,0 8px 20px #0004}
+.quest-summary:before{display:none}
+.quest-summary .eyebrow{color:#a15d2c}
+.quest-summary h3{font-family:Manrope,sans-serif;font-weight:900;font-size:14px;color:#315a2a;margin:10px 0 7px}
+.quest-summary p{color:#493521;font-size:10px;line-height:1.55}
+.quest-check{border-color:#876638;color:#76532b}
+.quest-progress{background:#d4bd91;margin:12px 0 8px}
+.quest-progress span{background:#8baf58}
+.quest-footer{color:#75552f}
+.quest-footer button{color:#315c29;font-weight:800}
+.realm-card,.side-actions,.tip-line,.site-footer{display:none}
+.game-panel{top:50%;right:165px;transform:translateY(-50%);width:min(360px,calc(100vw - 190px));max-height:80vh;background:#fff0d3f5;border:3px solid #76532a;color:#392a1a;border-radius:10px;box-shadow:0 4px 0 #302115,0 18px 60px #0008}
+.panel-heading h2{color:#392a1a}
+.panel-heading .eyebrow{color:#88612f}
+.inventory-item,.skill-card,.quest-card{background:#f7e7c7;border-color:#c2a475}
+.item-name,.skill-top,.quest-card p,.quest-card li{color:#4d3923}
+.inventory-item b,.skill-top b,.quest-card h3{color:#315a2a}
+.panel-note,.skill-card small,.skill-row{color:#725b3b}
+.icon-button{background:#e6c987;color:#392a1a;border-color:#8b6835}
+.touch-actions{right:166px;bottom:16px}
+.touch-actions button{background:#f3e2bc;color:#352719;border:2px solid #76552e;border-radius:8px}
+.touch-actions .attack-action{background:#b95b42;color:#fff2d7}
+@media(max-width:700px){
+ .header-actions{top:8px;left:auto;right:160px;transform:none}
+ .game-top-hud{top:8px;left:8px;width:calc(100% - 170px);padding:8px;min-height:0}
+ .player-avatar{width:32px;height:32px}
+ .player-badge b{font-size:12px}
+ .profile-card{top:120px;left:8px;width:min(245px,calc(100vw - 16px));padding:9px}
+ .profile-card p{display:none}
+ .profile-stats{margin-top:7px}
+ .quest-summary{top:auto;bottom:68px;left:8px;width:min(245px,calc(100vw - 16px));padding:9px}
+ .quest-summary p{font-size:9px}
+ .quickbar{right:8px;top:54px;width:126px;gap:4px}
+ .quickbar button{min-height:34px;padding:6px 8px;font-size:10px}
+ .message-toast{top:auto;bottom:12px;left:50%;max-width:calc(100vw - 280px);font-size:9px}
+ .game-bottom-hud{left:8px;bottom:8px;width:auto;max-width:calc(100vw - 280px)}
+ .location-chip{font-size:9px}
+ .game-panel{right:8px;left:8px;top:50%;transform:translateY(-50%);width:auto;max-height:70vh}
+ .touch-actions{right:140px;bottom:55px}
+}
+@media(max-width:440px){
+ .header-actions{right:138px}
+ .header-actions .help-button{font-size:0;padding:7px}
+ .header-actions .help-button span{font-size:11px}
+ .quickbar{width:116px}
+ .quickbar button{font-size:9px;gap:5px}
+ .profile-card{width:calc(100% - 140px);top:108px}
+ .profile-card h2{font-size:14px}
+ .profile-stats{gap:4px}
+ .profile-stats span{font-size:7px}
+ .profile-stats b{font-size:13px}
+ .quest-summary{width:calc(100% - 140px);bottom:60px}
+ .quest-summary h3{font-size:11px}
+ .quest-summary p{display:none}
+ .quest-progress{margin:7px 0}
+ .quest-footer{font-size:8px}
+ .game-bottom-hud{display:none}
+ .message-toast{max-width:calc(100vw - 155px);left:8px;transform:none;bottom:10px}
+ .touch-actions{right:126px;bottom:12px}
+}
