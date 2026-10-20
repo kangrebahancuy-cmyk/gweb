@@ -1,0 +1,18 @@
+name = "elder-realms-game"
+main = "workers/index.ts"
+compatibility_date = "2026-10-20"
+
+[vars]
+# Set this to the Supabase project URL before deployment.
+SUPABASE_URL = ""
+
+[[durable_objects.bindings]]
+name = "GAME_ROOMS"
+class_name = "GameRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["GameRoom"]
+
+# Configure credentials through the Cloudflare secret manager.
+# This worker is a starting point, not a completed production deployment.
