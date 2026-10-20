@@ -97,6 +97,12 @@ export class GameScene extends Phaser.Scene {
 
   preload(): void {
     this.load.image("starter-atlas", STARTER_ATLAS_DATA_URI);
+    this.load.spritesheet("slime-idle-sheet", "/assets/game/PNG/Slime1/Without_shadow/Slime1_Idle_without_shadow.png", { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet("slime-walk-sheet", "/assets/game/PNG/Slime1/Without_shadow/Slime1_Walk_without_shadow.png", { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet("slime-attack-sheet", "/assets/game/PNG/Slime1/Without_shadow/Slime1_Attack_without_shadow.png", { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet("slime-hurt-sheet", "/assets/game/PNG/Slime1/Without_shadow/Slime1_Hurt_without_shadow.png", { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet("slime-death-sheet", "/assets/game/PNG/Slime1/Without_shadow/Slime1_Death_without_shadow.png", { frameWidth: 64, frameHeight: 64 });
+    this.load.image("farm-terrain", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_terrain_summer_expanded.png");
   }
 
   create(): void {
@@ -105,6 +111,7 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setZoom(this.scale.width < 720 ? 0.82 : 1);
     this.createAtlasFrames();
+    this.createAssetAnimations();
     this.drawWorld();
     this.cropGraphics = this.add.graphics().setDepth(12);
     this.obstacles = this.physics.add.staticGroup();
@@ -119,9 +126,10 @@ export class GameScene extends Phaser.Scene {
     body.setOffset(20, 30);
     this.physics.add.collider(this.player, this.obstacles);
 
-    this.slime = this.physics.add.sprite(1190, 720, "starter-atlas", "slime");
+    this.slime = this.physics.add.sprite(1190, 720, "slime-idle-sheet", 0);
     this.slime.setDepth(20);
     this.slime.setDisplaySize(48, 48);
+    this.slime.play("slime-idle");
     this.slime.setCollideWorldBounds(true);
     const slimeBody = this.slime.body as Phaser.Physics.Arcade.Body;
     slimeBody.setSize(28, 24);
@@ -184,11 +192,32 @@ export class GameScene extends Phaser.Scene {
     if (!texture.has("slime")) texture.add("slime", 0, 64, 0, 64, 64);
     if (!texture.has("turnip")) texture.add("turnip", 0, 0, 64, 32, 32);
     if (!texture.has("grass")) texture.add("grass", 0, 32, 64, 32, 32);
+    const terrain = this.textures.get("farm-terrain");
+    if (terrain && !terrain.has("grass-tile")) terrain.add("grass-tile", 0, 0, 0, 16, 16);
+  }
+
+  private createAssetAnimations(): void {
+    const specs = [
+      ["slime-idle", "slime-idle-sheet", 5, 7, -1],
+      ["slime-walk", "slime-walk-sheet", 7, 10, -1],
+      ["slime-attack", "slime-attack-sheet", 9, 12, 0],
+      ["slime-hurt", "slime-hurt-sheet", 4, 12, 0],
+      ["slime-death", "slime-death-sheet", 9, 12, 0]
+    ] as const;
+    for (const [key, texture, end, frameRate, repeat] of specs) {
+      if (this.anims.exists(key)) continue;
+      this.anims.create({
+        key,
+        frames: this.anims.generateFrameNumbers(texture, { start: 0, end }),
+        frameRate,
+        repeat
+      });
+    }
   }
 
   private drawWorld(): void {
-    this.add.tileSprite(0, 0, WORLD_WIDTH, WORLD_HEIGHT, "starter-atlas", "grass")
-      .setOrigin(0, 0).setDepth(-101).setAlpha(0.9);
+    this.add.tileSprite(0, 0, WORLD_WIDTH, WORLD_HEIGHT, "farm-terrain", "grass-tile")
+      .setOrigin(0, 0).setDepth(-101);
     const g = this.add.graphics().setDepth(-100);
     // Subtle grass variation gives the world texture without obscuring the imported sprites.
     for (let y = 16; y < WORLD_HEIGHT; y += 48) {
@@ -470,13 +499,13 @@ export class GameScene extends Phaser.Scene {
     if (this.time.now - this.lastSlimeHit < 550) return;
     this.lastSlimeHit = this.time.now;
     this.slimeHealth -= 1;
-    this.slime.setTint(0xffffff);
-    this.time.delayedCall(130, () => this.slime.clearTint());
     if (this.slimeHealth <= 0) {
       this.slimeAlive = false;
-      this.slime.setVisible(false);
-      this.slime.setActive(false);
       this.slime.setVelocity(0, 0);
+      this.slime.play("slime-death", true);
+      this.slime.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+        this.slime.setVisible(false).setActive(false);
+      });
       this.slimeKills += 1;
       this.save.xp += 20;
       this.save.gold += 5;
@@ -486,6 +515,10 @@ export class GameScene extends Phaser.Scene {
       this.saveGame();
       this.emitHud();
     } else {
+      this.slime.play("slime-hurt", true);
+      this.slime.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+        if (this.slimeAlive && this.slime.active) this.slime.play("slime-idle", true);
+      });
       this.showMessage(`Hit! Slime health: ${this.slimeHealth}/3.`);
     }
   }
@@ -496,6 +529,7 @@ export class GameScene extends Phaser.Scene {
         this.slimeAlive = true;
         this.slimeHealth = 3;
         this.slime.setPosition(1190, 720).setVisible(true).setActive(true).clearTint();
+        this.slime.play("slime-idle", true);
         this.showMessage("A green slime has returned to the forest.");
       }
       return;
@@ -504,11 +538,20 @@ export class GameScene extends Phaser.Scene {
     if (distance < 260 && distance > 46) {
       const direction = new Phaser.Math.Vector2(this.player.x - this.slime.x, this.player.y - this.slime.y).normalize();
       this.slime.setVelocity(direction.x * 52, direction.y * 52);
+      const animationKey = this.slime.anims.currentAnim?.key;
+      if (animationKey !== "slime-walk" && animationKey !== "slime-hurt" && animationKey !== "slime-attack") {
+        this.slime.play("slime-walk", true);
+      }
     } else {
       this.slime.setVelocity(0, 0);
+      const animationKey = this.slime.anims.currentAnim?.key;
+      if (distance >= 46 && animationKey !== "slime-idle" && animationKey !== "slime-hurt" && animationKey !== "slime-attack") {
+        this.slime.play("slime-idle", true);
+      }
     }
     if (distance < 46 && time - this.lastPlayerHit > 1500) {
       this.lastPlayerHit = time;
+      this.slime.play("slime-attack", true);
       this.health = Math.max(0, this.health - 8);
       if (this.health === 0) {
         this.health = 100;
