@@ -12,6 +12,11 @@ export default function AuthPanel({ onClose }: AuthPanelProps) {
   const [session, setSession] = useState<Session | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  const [character, setCharacter] = useState<{ id: string; display_name: string; region_id: string; gold: number } | null>(null);
+  const [characterName, setCharacterName] = useState("");
+  const [characterLoading, setCharacterLoading] = useState(false);
+  const [characterNotice, setCharacterNotice] = useState("");
+  const gameApiUrl = (import.meta.env.VITE_GAME_API_URL || "").replace(/\/$/, "");
 
   useEffect(() => {
     if (!supabase) return;
@@ -21,6 +26,49 @@ export default function AuthPanel({ onClose }: AuthPanelProps) {
     });
     return () => data.subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!session || !gameApiUrl) { setCharacter(null); return; }
+    let cancelled = false;
+    setCharacterLoading(true);
+    setCharacterNotice("");
+    void fetch(gameApiUrl + "/api/character", { headers: { Authorization: "Bearer " + session.access_token } })
+      .then(async (response) => {
+        const data = await response.json() as { character?: { id: string; display_name: string; region_id: string; gold: number } | null; error?: string };
+        if (!response.ok) throw new Error(data.error || "Could not load character.");
+        if (!cancelled) {
+          setCharacter(data.character ?? null);
+          setCharacterName(data.character?.display_name ?? (session.user.user_metadata.display_name as string) ?? "");
+        }
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setCharacterNotice(error instanceof Error ? error.message : "Could not connect to the game server.");
+      })
+      .finally(() => { if (!cancelled) setCharacterLoading(false); });
+    return () => { cancelled = true; };
+  }, [session, gameApiUrl]);
+
+  async function createCharacter(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!session || !gameApiUrl) return;
+    setCharacterLoading(true);
+    setCharacterNotice("");
+    try {
+      const response = await fetch(gameApiUrl + "/api/character", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + session.access_token, "Content-Type": "application/json" },
+        body: JSON.stringify({ displayName: characterName })
+      });
+      const data = await response.json() as { character?: { id: string; display_name: string; region_id: string; gold: number }; error?: string };
+      if (!response.ok || !data.character) throw new Error(data.error || "Could not create character.");
+      setCharacter(data.character);
+      setCharacterNotice("Your character is saved in the Neon-backed game API.");
+    } catch (error) {
+      setCharacterNotice(error instanceof Error ? error.message : "Could not create character.");
+    } finally {
+      setCharacterLoading(false);
+    }
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -73,7 +121,12 @@ export default function AuthPanel({ onClose }: AuthPanelProps) {
             <div className="account-emblem">✦</div>
             <b>{session.user.user_metadata.display_name || session.user.email || "Wayfarer"}</b>
             <small>{session.user.email}</small>
-            <p>Your Supabase session is active. Character saving and online multiplayer are separate systems and are not connected to this account yet.</p>
+            {!gameApiUrl && <p className="auth-config-warning">VITE_GAME_API_URL is not configured. Sign-in works, but persistent character storage is not connected.</p>}
+            {gameApiUrl && characterLoading && <p className="character-status">Connecting to your character record…</p>}
+            {gameApiUrl && character && <div className="character-card"><span className="eyebrow">PERSISTENT CHARACTER</span><b>{character.display_name}</b><small>Region: {character.region_id} · {character.gold} gold</small><small>Character ID: {character.id}</small></div>}
+            {gameApiUrl && !character && !characterLoading && <form className="auth-form character-form" onSubmit={(event) => void createCharacter(event)}><label>Character name<input value={characterName} onChange={(event) => setCharacterName(event.target.value)} minLength={2} maxLength={20} required placeholder="Wayfarer" /></label><button className="auth-submit" type="submit" disabled={characterLoading}>Create persistent character</button></form>}
+            {characterNotice && <p className="auth-notice" role="status">{characterNotice}</p>}
+            <p>Your character record is stored by the game API. In-game inventory, farming, and combat still use local prototype state and are not yet synchronized.</p>
             <button className="auth-submit" onClick={() => void signOut()} disabled={busy}>{busy ? "Please wait…" : "Sign out"}</button>
           </div>
         ) : (
