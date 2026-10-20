@@ -44,7 +44,29 @@ function Panel({ state }: { state: HudState }) {
           <div className="inventory-grid">
             {Object.entries(state.inventory).map(([id, count]) => (
               <div className="inventory-item" key={id}>
-                <span className={`item-glyph ${id}`}>{id === "turnip_seed" ? "✦" : id === "turnip" ? "♣" : "●"}</span>
+                <span
+                  className={`item-glyph ${id}`}
+                  aria-label={id.replaceAll("_", " ")}
+                  style={
+                    id === "turnip_seed"
+                      ? {
+                          backgroundImage: 'url("/assets/game/Seeds_Cereals.png")',
+                          backgroundSize: "50px 125px",
+                          backgroundPosition: "0 0"
+                        }
+                      : id === "turnip"
+                        ? {
+                            backgroundImage: 'url("/assets/game/Vegetables.png")',
+                            backgroundSize: "100px 175px",
+                            backgroundPosition: "-75px -50px"
+                          }
+                        : {
+                            backgroundImage: 'url("/assets/game/PNG/Slime1/Without_shadow/Slime1_Idle_without_shadow.png")',
+                            backgroundSize: "150px 100px",
+                            backgroundPosition: "0 0"
+                          }
+                  }
+                />
                 <span className="item-name">{id.replaceAll("_", " ")}</span><b>{count}</b>
               </div>
             ))}
