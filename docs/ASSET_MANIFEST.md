@@ -1,20 +1,39 @@
-# Asset manifest
+# Asset manifest and integration audit
 
-The owner supplied four ZIP archives in the project conversation. A compact 128×128 PNG atlas is embedded as a data URI in `src/game/atlasData.ts` so the starter scene can load it without a binary-file API upload.
+Audit date: 2026-10-20
 
-| Atlas frame | Source archive | Source file | Intended use | Import status |
-|---|---|---|---|---|
-| `player` | Pixel Art Character | `PNG/Boy  sheet wlaking and Idle.png` | Starter character portrait/sprite frame | Cropped from first 64×64 cell; full animation sheet not yet wired |
-| `slime` | Free Slime Mobs | `PNG/Slime1/Without_shadow/Slime1_Idle_without_shadow.png` | First hostile creature | Cropped from first 64×64 cell; animation and AI polish pending |
-| `turnip` | Farming Set | `farming set opengameart/Vegetables.png` | Root-vegetable stand-in for the prototype turnip | Cropped 32×32 radish-like icon; not a verified turnip sprite |
-| `grass` | Farming Sim Asset Pack | `ReColor/16x16/Tilesets (Compact)/vectoraith_tileset_farmingsims_terrains_recolor.png` | Terrain texture sample | Cropped 16×16 patch and enlarged with nearest-neighbor |
+The four original ZIP archives are available in the project conversation/library and have now been inspected. The current game still embeds only a small 128×128 PNG atlas in `src/game/atlasData.ts`; the full source art has **not** yet been integrated into the running scene.
 
-The current map uses original Phaser-drawn terrain, paths, trees, and building silhouettes. Do not claim those shapes are part of a downloaded pack. The complete source archives are not committed to the public website.
+## Source archive inventory
 
-## Next asset work
+| Pack | Verified contents | Current integration |
+|---|---|---|
+| Farming Sim Asset Pack (`vectoraith_tileset_farming_sim_essentials.zip`) | 474 archive entries; includes 16×16, 32×32 and 48×48 tile sets, buildings, terrain, crops, orchard/details, seasonal variants, and farm animal/farmer sprites. | One small terrain patch only. The rest of the tilesets and farm sprites are not yet loaded by Phaser. |
+| Farming Set (`Farming Stuff.zip`) | 14 archive entries; includes vegetables, fruits, cereals, seeds, crates/sacks, hay, sliced produce, and nested Horse/Slavic Woman ZIPs. | One small crop from `farming set opengameart/Vegetables.png` used as a temporary turnip stand-in. |
+| Pixel Art Character (`Pixel Art Character-TheGameAssetsMine-.zip`) | Character PNG `Pixel Art Character-TheGameAssetsMine-/PNG/Boy  sheet wlaking and Idle.png`. | One cropped frame only; the full sheet is not yet loaded as a spritesheet or animated. |
+| Free Slime Mobs (`craftpix-net-788364-free-slime-mobs-pixel-art-top-down-sprite-pack.zip`) | 604 archive entries; includes Slime 1/2/3 with idle, walk, run, attack, hurt and death art, including direction variants and Aseprite sources. | One idle-frame crop only; the animation sheets are not yet connected to the game. |
 
-1. Verify and record the exact license and attribution requirements from each pack's original download page and archive.
-2. Add the complete sprite sheets as actual binary files through a local Git checkout or Git LFS/API workflow.
-3. Use the original frame layout to wire player idle/walk and slime idle/walk/attack/hurt/death animations.
-4. Replace hand-drawn map surfaces with a verified tilemap built from the terrain/building tilesets.
-5. Expand the manifest with frame dimensions, animation frame counts, and exact licenses once confirmed.
+## Existing atlas frames
+
+| Atlas frame | Source | Intended use | Status |
+|---|---|---|---|
+| `player` | Pixel Art Character PNG | Player sprite | Cropped first cell; animation not connected |
+| `slime` | Slime 1 idle PNG without shadow | Hostile creature | Cropped first cell; animation not connected |
+| `turnip` | Farming Set vegetables PNG | Harvest item | Temporary root-vegetable stand-in, not verified as a turnip |
+| `grass` | Farming Sim terrain tileset | Terrain texture | One 16×16 patch, enlarged with nearest-neighbor |
+
+The map's current paths, trees, buildings and other scenery are drawn by the game code; they should not be represented as imported artwork from these packs.
+
+## Integration plan
+
+1. Preserve the source images in a dedicated public asset directory (or use Git LFS if the asset collection becomes large), without embedding large PNGs as base64 in TypeScript.
+2. Load the player sheet as a Phaser spritesheet after confirming its exact frame dimensions and layout; wire idle/walk animations using the real frame layout.
+3. Load the Slime 1 PNG sheets and wire idle/walk/attack/hurt/death animations using verified frame dimensions and counts. Select a consistent direction/shadow variant.
+4. Use the Farming Sim terrain, buildings, crops, and details tilesets to create a tilemap; preserve correct tile sizes and nearest-neighbor pixel-art rendering.
+5. Integrate Farming Set produce/seed/crate assets into inventory icons and crop rewards where appropriate.
+6. Verify each pack's license and attribution from its original distribution page and included documentation before publishing assets. License details are not yet confirmed in this manifest.
+7. Run `npm install`, `npm run typecheck`, `npm test`, `npm run lint`, and `npm run build` in an environment with npm registry access; record results before calling the stage complete.
+
+## Stage 1 status
+
+**Audit completed; full asset integration remains in progress.** The archive contents are now inventoried, but the full art sheets, tilemaps, and animations are not yet integrated into the live Phaser scene. Do not mark Stage 1 complete until the integration and build checks above pass.
