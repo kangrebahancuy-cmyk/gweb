@@ -113,6 +113,8 @@ export class GameScene extends Phaser.Scene {
     this.load.image("farm-buildings", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_buildings.png");
     this.load.spritesheet("farm-produce", "/assets/game/Vegetables.png", { frameWidth: 32, frameHeight: 32 });
     this.load.image("farm-crops", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_crops.png");
+    this.load.image("farm-orchard", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_orchard.png");
+    this.load.image("farm-details", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_details.png");
     this.load.spritesheet("farm-seeds", "/assets/game/Seeds_Cereals.png", { frameWidth: 32, frameHeight: 32 });
   }
 
@@ -228,6 +230,14 @@ export class GameScene extends Phaser.Scene {
       if (!crops.has("sprout")) crops.add("sprout", 0, 0, 0, 16, 16);
       if (!crops.has("young-crop")) crops.add("young-crop", 0, 32, 0, 16, 16);
     }
+    const orchard = this.textures.get("farm-orchard");
+    if (orchard) {
+      if (!orchard.has("tree-green")) orchard.add("tree-green", 0, 64, 0, 32, 32);
+      if (!orchard.has("tree-fruit")) orchard.add("tree-fruit", 0, 96, 0, 32, 32);
+      if (!orchard.has("tree-blossom")) orchard.add("tree-blossom", 0, 32, 0, 32, 32);
+    }
+    const details = this.textures.get("farm-details");
+    if (details && !details.has("flower-patch")) details.add("flower-patch", 0, 0, 64, 32, 32);
   }
 
   private createAssetAnimations(): void {
@@ -333,10 +343,17 @@ export class GameScene extends Phaser.Scene {
       [970, 1130], [650, 1110], [480, 1050], [260, 1120], [1630, 420], [1730, 520]
     ];
     trees.forEach(([x, y], i) => {
-      g.fillStyle(0x5d4730, 1).fillRoundedRect(x - 6, y + 12, 12, 24, 4);
-      g.fillStyle(i % 3 === 0 ? 0x315f3b : 0x3e7042, 1).fillCircle(x, y, 28);
-      g.fillStyle(0x6f9b51, 1).fillCircle(x - 8, y - 7, 17);
-      g.fillStyle(0x8bb45c, 0.75).fillCircle(x + 7, y - 11, 9);
+      const frame = i % 5 === 0 ? "tree-fruit" : i % 4 === 0 ? "tree-blossom" : "tree-green";
+      this.add.image(x, y, "farm-orchard", frame)
+        .setDisplaySize(60, 60)
+        .setDepth(16);
+    });
+    // Small original details tiles soften the edges of the orchard and farm paths.
+    [[650, 350], [690, 365], [1000, 430], [1060, 445], [1510, 650], [1580, 690]].forEach(([x, y]) => {
+      this.add.image(x, y, "farm-details", "flower-patch")
+        .setDisplaySize(32, 32)
+        .setDepth(10)
+        .setAlpha(0.95);
     });
     g.fillStyle(0xf0d8a3, 1).fillRoundedRect(1080, 750, 245, 28, 10);
     g.fillStyle(0x8b6d45, 1).fillRoundedRect(1090, 755, 225, 18, 7);
