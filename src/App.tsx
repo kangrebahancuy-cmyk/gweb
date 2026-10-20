@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Phaser from "phaser";
 import { GameScene } from "./game/GameScene";
+import AuthPanel from "./components/AuthPanel";
 
 type HudState = {
   inventory: Record<string, number>;
@@ -90,6 +91,7 @@ export default function App() {
   const gameRef = useRef<Phaser.Game | null>(null);
   const [state, setState] = useState<HudState>(initialState);
   const [showHelp, setShowHelp] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
 
   useEffect(() => {
     const handleHud = (event: Event) => setState((event as CustomEvent<HudState>).detail);
@@ -125,7 +127,7 @@ export default function App() {
           <span><strong>ELDER REALMS</strong><small>ONLINE · EARLY ACCESS</small></span>
         </a>
         <div className="realm-status"><span className="status-dot" /> FERNHOLLOW <span className="status-divider">/</span> LOCAL REALM</div>
-        <button className="help-button" onClick={() => setShowHelp((value) => !value)}>How to play <span>?</span></button>
+        <div className="header-actions"><button className="account-button" onClick={() => setShowAuth(true)}>Account ↗</button><button className="help-button" onClick={() => setShowHelp((value) => !value)}>How to play <span>?</span></button></div>
       </header>
 
       <section className="game-layout">
@@ -187,6 +189,7 @@ export default function App() {
       </section>
 
       <Panel state={state} />
+      {showAuth && <AuthPanel onClose={() => setShowAuth(false)} />}
       {showHelp && <div className="help-overlay" role="dialog" aria-modal="true" aria-label="How to play">
         <div className="help-card"><button className="icon-button close-help" onClick={() => setShowHelp(false)}>×</button>
           <span className="eyebrow">FIELD GUIDE</span><h2>Your first day in Fernhollow</h2>
