@@ -635,6 +635,9 @@ export class GameScene extends Phaser.Scene {
     if (distance < 46 && time - this.lastPlayerHit > 1500) {
       this.lastPlayerHit = time;
       this.slime.play("slime-attack", true);
+      this.slime.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+        if (this.slimeAlive && this.slime.active) this.slime.play("slime-idle", true);
+      });
       this.health = Math.max(0, this.health - 8);
       if (this.health === 0) {
         this.health = 100;
