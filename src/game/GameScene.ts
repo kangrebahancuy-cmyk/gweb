@@ -84,7 +84,6 @@ export class GameScene extends Phaser.Scene {
   private joystickOrigin = new Phaser.Math.Vector2(0, 0);
   private joystickKnob = new Phaser.Math.Vector2(0, 0);
   private touchGraphics!: Phaser.GameObjects.Graphics;
-  private cropGraphics!: Phaser.GameObjects.Graphics;
   private plotSprites = new Map<number, Phaser.GameObjects.Sprite>();
   private playerFacing: "down" | "up" | "left" | "right" = "down";
   private obstacles!: Phaser.Physics.Arcade.StaticGroup;
@@ -115,7 +114,6 @@ export class GameScene extends Phaser.Scene {
     this.load.image("farm-crops", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_crops.png");
     this.load.image("farm-orchard", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_orchard.png");
     this.load.image("farm-details", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_details.png");
-    this.load.spritesheet("farm-seeds", "/assets/game/Seeds_Cereals.png", { frameWidth: 32, frameHeight: 32 });
   }
 
   create(): void {
@@ -126,7 +124,6 @@ export class GameScene extends Phaser.Scene {
     this.createAtlasFrames();
     this.createAssetAnimations();
     this.drawWorld();
-    this.cropGraphics = this.add.graphics().setDepth(12);
     this.createPlotSprites();
     this.obstacles = this.physics.add.staticGroup();
     this.createWorldObjects();
