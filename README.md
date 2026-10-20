@@ -4,7 +4,7 @@ Elder Realms Online is an original 2D pixel-art farming-adventure MMORPG project
 
 ## Current milestone
 
-**Playable local prototype in progress.** The repository now uses Vite, React, TypeScript, and Phaser 3. The first playable slice includes a scrollable village/farm area, desktop movement, touch joystick, NPC interaction, planting and harvesting, a starter quest, slime combat, inventory/skills/quest panels, and local prototype save data.
+**Playable local prototype in progress.** The repository uses Vite, React, TypeScript, and Phaser 3. The playable slice includes a scrollable village/farm area, directional player idle/walk animations, touch joystick, NPC interaction, planting and harvesting with original crop sprites, a starter quest, animated slime combat, sprite-based inventory icons, skills/quest panels, and local prototype save data. The map now uses original terrain, building, orchard, and detail sprites alongside some procedural paths and pond scenery.
 
 The current browser prototype is **not yet an online MMORPG**: gameplay saves are local to the browser, and authentication, Neon persistence, and Cloudflare multiplayer still require configuration and implementation. Do not treat localStorage state or client-side rewards as secure production game data.
 
@@ -55,7 +55,7 @@ A GitHub edit is not proof that these commands pass. Run them in a local or CI e
 
 ## Assets
 
-The starter atlas is derived from the four user-supplied ZIP archives. It contains small cropped samples from the Pixel Art Character, Free Slime Mobs, Farming Set, and Farming Sim packs. The original ZIPs are not copied wholesale into the public site. See [docs/ASSET_MANIFEST.md](docs/ASSET_MANIFEST.md) and [docs/ASSET_CREDITS.md](docs/ASSET_CREDITS.md) for provenance and remaining license checks.
+The game loads original sprite sheets from the user-supplied asset packs under `public/assets/game/`: the player character sheet, Slime 1 animation sheets, Farming Sim terrain/buildings/orchard/details/crops, and Farming Set vegetables/seeds. The compact starter atlas remains for legacy props. See [docs/ASSET_MANIFEST.md](docs/ASSET_MANIFEST.md) and [docs/ASSET_CREDITS.md](docs/ASSET_CREDITS.md) for provenance, browser QA needs, and remaining license checks.
 
 ## Security and deployment status
 
@@ -64,7 +64,7 @@ No production credentials are committed. The Worker and SQL files are infrastruc
 ## Roadmap
 
 1. **Playable local slice:** core Phaser scene, desktop/touch controls, farming, inventory, quest, and a first enemy.
-2. **Verified asset integration:** inspect licenses and frame layouts, expand atlas/manifest, add animation and tilemap support.
+2. **Verified asset integration:** complete browser visual QA, verify licenses and frame layouts, and evolve the hand-assembled map into a full tilemap.
 3. **Cloud services:** Supabase Auth, Neon migrations, Cloudflare Worker and Durable Object room.
 4. **Authoritative gameplay:** server-side movement validation, farming timers, combat, XP, loot, and inventory transactions.
 5. **Persistent multiplayer:** character load/save, room synchronization, reconnects, abuse prevention, and two-client tests.
