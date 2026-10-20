@@ -84,6 +84,7 @@ export class GameScene extends Phaser.Scene {
   private joystickOrigin = new Phaser.Math.Vector2(0, 0);
   private joystickKnob = new Phaser.Math.Vector2(0, 0);
   private touchGraphics!: Phaser.GameObjects.Graphics;
+  private cropGraphics!: Phaser.GameObjects.Graphics;
   private obstacles!: Phaser.Physics.Arcade.StaticGroup;
   private onUiActionBound = (event: Event) => {
     const custom = event as CustomEvent<string>;
@@ -104,6 +105,7 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setZoom(this.scale.width < 720 ? 0.82 : 1);
     this.drawWorld();
+    this.cropGraphics = this.add.graphics().setDepth(12);
     this.createAtlasFrames();
     this.obstacles = this.physics.add.staticGroup();
     this.createWorldObjects();
@@ -344,9 +346,7 @@ export class GameScene extends Phaser.Scene {
     this.touchGraphics.fillStyle(0x14241c, 0.55).fillCircle(x, y, 30);
     this.touchGraphics.fillStyle(color, 0.9).fillCircle(x, y, 24);
     this.touchGraphics.lineStyle(2, 0xe9d9aa, 0.9).strokeCircle(x, y, 24);
-    this.add.text(x, y, label, {
-      fontFamily: "monospace", fontSize: "16px", color: "#fff7df", fontStyle: "bold"
-    }).setOrigin(0.5).setScrollFactor(0).setDepth(1001).setAlpha(0.01).destroy();
+    // Labels for these buttons are rendered by the responsive React touch toolbar.
   }
 
   private handleResize(gameSize: Phaser.Structs.Size): void {
@@ -443,7 +443,8 @@ export class GameScene extends Phaser.Scene {
 
   private updatePlots(): void {
     const now = Date.now();
-    const g = this.add.graphics().setDepth(12);
+    const g = this.cropGraphics;
+    g.clear();
     this.save.plots.forEach((plot) => {
       if (plot.plantedAt === null) return;
       const grown = now - plot.plantedAt >= CROP_GROW_MS;
@@ -455,7 +456,6 @@ export class GameScene extends Phaser.Scene {
         g.fillStyle(0x8ebd5b, 1).fillEllipse(plot.x, plot.y - 7, 12, 6);
       }
     });
-    g.destroy();
   }
 
   private attack(): void {
