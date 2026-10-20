@@ -114,8 +114,6 @@ export class GameScene extends Phaser.Scene {
     this.player.setDepth(20);
     this.player.setDisplaySize(48, 48);
     this.player.setCollideWorldBounds(true);
-    this.player.setDamping(true);
-    this.player.setDrag(0.001);
     const body = this.player.body as Phaser.Physics.Arcade.Body;
     body.setSize(24, 24);
     body.setOffset(20, 30);
@@ -328,7 +326,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private drawTouchControls(): void {
-    if (this.scale.width > 900 && !this.input.manager.game.device.input.touch) return;
+    if (this.scale.width > 900 && !this.sys.game.device.input.touch) return;
     const g = this.touchGraphics;
     const w = this.scale.width;
     const h = this.scale.height;
