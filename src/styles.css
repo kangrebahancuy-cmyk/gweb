@@ -212,3 +212,35 @@ body{background:#11150f}
  .message-toast{max-width:calc(100vw - 155px);left:8px;transform:none;bottom:10px}
  .touch-actions{right:126px;bottom:12px}
 }
+
+
+/* Minimap and richer classic-RPG visual language */
+.mini-map{position:absolute;z-index:8;right:16px;top:16px;width:150px;height:150px;border:4px solid #6d4a24;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 35% 25%,#b8d58b 0 16%,transparent 17%),radial-gradient(circle at 72% 65%,#7eaa5b 0 18%,transparent 19%),#8fbf70;box-shadow:0 3px 0 #302115,0 8px 24px #0006,inset 0 0 0 3px #f5dfaa}
+.mini-map:before{content:"";position:absolute;inset:5px;border:1px solid #fff0c1;border-radius:50%;pointer-events:none}
+.map-water{position:absolute;right:-13px;bottom:-4px;width:73px;height:70px;background:repeating-linear-gradient(12deg,#288ab4 0 5px,#51bad0 5px 8px);border-radius:55% 0 0 0;transform:rotate(-8deg)}
+.map-road{position:absolute;background:#d8bf83;border:1px solid #a28a57;box-shadow:inset 0 0 0 2px #f0dda8}
+.map-road-main{left:57px;top:-6px;width:18px;height:170px;transform:rotate(8deg)}
+.map-road-cross{left:-5px;top:70px;width:165px;height:13px;transform:rotate(-10deg)}
+.map-tree{position:absolute;width:9px;height:9px;border-radius:50%;background:#2f753b;border:2px solid #75b35b;box-shadow:1px 2px 0 #204a2a}
+.map-tree.t1{left:22px;top:24px}.map-tree.t2{left:42px;top:48px}.map-tree.t3{right:23px;top:27px}.map-tree.t4{left:26px;bottom:25px}.map-tree.t5{right:35px;bottom:35px}.map-tree.t6{right:15px;top:80px}
+.map-house{position:absolute;width:13px;height:10px;background:#b65c38;border:2px solid #f4d99c;box-shadow:0 2px 0 #704426;transform:rotate(4deg)}
+.map-house.h1{left:24px;top:59px}.map-house.h2{right:27px;top:53px}.map-house.h3{left:48px;bottom:20px}.map-house.h4{right:42px;bottom:47px}
+.map-player{position:absolute;z-index:3;left:72px;top:68px;width:9px;height:9px;background:#ffed77;border:2px solid #fff8cf;border-radius:50%;box-shadow:0 0 0 4px #e8b83e66,0 0 9px #fff}
+.map-compass{position:absolute;z-index:4;top:4px;left:calc(50% - 10px);padding:1px 5px;border-radius:4px;background:#fff0cf;border:1px solid #76532a;color:#302316;font-size:9px;font-weight:900}
+.map-location{position:absolute;z-index:3;bottom:10px;left:0;right:0;text-align:center;color:#fff4cc;font:8px "DM Mono",monospace;text-shadow:0 1px 3px #18321c;letter-spacing:.08em}
+.inventory-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+.inventory-item{position:relative;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:2px solid #8f7042;background:linear-gradient(145deg,#ead5a6,#d4b77d);box-shadow:inset 0 0 0 1px #fff1c7;transition:transform .12s,border-color .12s}
+.inventory-item:hover{transform:translateY(-2px);border-color:#f4d36e;z-index:2}
+.inventory-item .item-glyph{width:32px;height:32px;background-size:cover!important;image-rendering:pixelated}
+.inventory-item .item-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;color:#49341e;text-transform:capitalize}
+.inventory-item>b{position:absolute;right:3px;bottom:2px;padding:1px 4px;border-radius:3px;background:#17231c;color:#fff0c8;font:10px "DM Mono",monospace}
+.game-panel{z-index:20}
+@media(max-width:700px){
+ .mini-map{top:8px;right:8px;width:106px;height:106px;border-width:3px}
+ .map-road-main{left:40px;width:13px}.map-road-cross{top:49px}
+ .map-player{left:50px;top:47px}
+ .map-location{font-size:6px;bottom:7px}
+ .map-house{transform:scale(.8)}
+ .inventory-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+ .inventory-item{min-height:58px;padding:4px}
+}
