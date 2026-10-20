@@ -214,7 +214,7 @@ export class GameScene extends Phaser.Scene {
     if (!texture.has("grass")) texture.add("grass", 0, 32, 64, 32, 32);
     const terrain = this.textures.get("farm-terrain");
     if (terrain && !terrain.has("grass-tile")) terrain.add("grass-tile", 0, 0, 0, 16, 16);
-    if (terrain && !terrain.has("soil-bed")) terrain.add("soil-bed", 0, 32, 0, 32, 32);
+    if (terrain && !terrain.has("soil-bed")) terrain.add("soil-bed", 0, 0, 32, 32, 32);
     const buildings = this.textures.get("farm-buildings");
     if (buildings) {
       if (!buildings.has("farmhouse")) buildings.add("farmhouse", 0, 0, 0, 64, 64);
