@@ -108,6 +108,7 @@ export class GameScene extends Phaser.Scene {
     this.load.spritesheet("slime-hurt-sheet", "/assets/game/PNG/Slime1/Without_shadow/Slime1_Hurt_without_shadow.png", { frameWidth: 64, frameHeight: 64 });
     this.load.spritesheet("slime-death-sheet", "/assets/game/PNG/Slime1/Without_shadow/Slime1_Death_without_shadow.png", { frameWidth: 64, frameHeight: 64 });
     this.load.image("farm-terrain", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_terrain_summer_expanded.png");
+    this.load.image("farm-buildings", "/assets/game/Original/16x16/Tilesets%20(Compact)/vectoraith_tileset_farmingsims_buildings.png");
   }
 
   create(): void {
@@ -199,6 +200,12 @@ export class GameScene extends Phaser.Scene {
     if (!texture.has("grass")) texture.add("grass", 0, 32, 64, 32, 32);
     const terrain = this.textures.get("farm-terrain");
     if (terrain && !terrain.has("grass-tile")) terrain.add("grass-tile", 0, 0, 0, 16, 16);
+    const buildings = this.textures.get("farm-buildings");
+    if (buildings) {
+      if (!buildings.has("farmhouse")) buildings.add("farmhouse", 0, 0, 0, 64, 64);
+      if (!buildings.has("barn")) buildings.add("barn", 0, 96, 64, 96, 96);
+      if (!buildings.has("small-house")) buildings.add("small-house", 0, 64, 192, 64, 64);
+    }
   }
 
   private createAssetAnimations(): void {
@@ -246,12 +253,13 @@ export class GameScene extends Phaser.Scene {
     g.fillStyle(0x5e9e9b, 1).fillEllipse(870, 935, 190, 112);
     g.lineStyle(8, 0xc9d6a1, 1).strokeEllipse(870, 935, 190, 112);
 
-    // Original house and general store shapes.
-    this.drawBuilding(g, 210, 185, 150, 115, 0xdbc28a, 0x9d5140);
-    this.drawBuilding(g, 690, 205, 140, 100, 0xd7c58f, 0x526e48);
-    this.drawBuilding(g, 1350, 290, 150, 110, 0xd8bf87, 0x805c38);
-    g.fillStyle(0xf4e8c9, 1).fillRoundedRect(700, 215, 120, 80, 5);
-    g.fillStyle(0xf4e8c9, 1).fillRoundedRect(1360, 300, 130, 90, 5);
+    // Imported buildings cropped from the Farming Sim tileset.
+    this.add.image(285, 235, "farm-buildings", "farmhouse")
+      .setDisplaySize(150, 135).setDepth(-90);
+    this.add.image(760, 255, "farm-buildings", "barn")
+      .setDisplaySize(150, 150).setDepth(-90);
+    this.add.image(1425, 345, "farm-buildings", "small-house")
+      .setDisplaySize(130, 120).setDepth(-90);
 
     // Tree clusters mark the forest edge and resource areas.
     const trees = [
