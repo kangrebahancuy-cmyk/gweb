@@ -355,6 +355,56 @@ export class GameScene extends Phaser.Scene {
     g.fillStyle(0xf0d8a3, 1).fillRoundedRect(1080, 750, 245, 28, 10);
     g.fillStyle(0x8b6d45, 1).fillRoundedRect(1090, 755, 225, 18, 7);
     g.fillStyle(0x315d39, 1).fillRoundedRect(1120, 765, 180, 5, 2);
+    // Extra village dressing: paving seams, garden borders, signposts and clustered foliage.
+    const paving = this.add.graphics().setDepth(-97);
+    paving.lineStyle(1, 0x8e744d, 0.45);
+    for (let x = 96; x < 1500; x += 34) {
+      paving.lineBetween(x, 307, x + 12, 365);
+      paving.lineBetween(x + 14, 307, x + 26, 365);
+    }
+    for (let y = 316; y < 365; y += 16) paving.lineBetween(82, y, 1500, y);
+    // Garden fence rails around the farm, with repeated posts for a connected silhouette.
+    const fence = this.add.graphics().setDepth(8);
+    fence.lineStyle(5, 0x67452b, 1);
+    fence.strokeLineShape(new Phaser.Geom.Line(72, 602, 608, 602));
+    fence.strokeLineShape(new Phaser.Geom.Line(72, 602, 72, 710));
+    fence.strokeLineShape(new Phaser.Geom.Line(608, 602, 608, 710));
+    fence.strokeLineShape(new Phaser.Geom.Line(72, 710, 608, 710));
+    fence.lineStyle(2, 0xc49a5c, 1);
+    fence.strokeLineShape(new Phaser.Geom.Line(72, 596, 608, 596));
+    fence.strokeLineShape(new Phaser.Geom.Line(72, 606, 608, 606));
+    fence.strokeLineShape(new Phaser.Geom.Line(66, 704, 614, 704));
+    for (let x = 78; x <= 604; x += 28) {
+      fence.fillStyle(0x9b7143, 1).fillRect(x, 590, 5, 24);
+      fence.fillStyle(0x9b7143, 1).fillRect(x, 697, 5, 22);
+    }
+    // Scatter small flower patches and orchard trees in irregular groups to soften empty grass.
+    const extraFoliage: Array<[number, number, string]> = [
+      [120, 220, "tree-green"], [190, 245, "tree-blossom"], [225, 185, "tree-green"],
+      [565, 190, "tree-fruit"], [625, 210, "tree-green"], [875, 185, "tree-green"],
+      [990, 210, "tree-blossom"], [1160, 245, "tree-green"], [1285, 225, "tree-fruit"],
+      [1550, 300, "tree-green"], [1660, 335, "tree-blossom"], [1750, 370, "tree-green"],
+      [1650, 610, "tree-fruit"], [1730, 680, "tree-green"], [1580, 930, "tree-blossom"],
+      [1430, 1010, "tree-green"], [1190, 1150, "tree-fruit"], [790, 1220, "tree-green"],
+      [330, 1225, "tree-blossom"], [170, 1050, "tree-green"], [590, 880, "tree-fruit"]
+    ];
+    extraFoliage.forEach(([x, y, frame], i) => {
+      this.add.image(x, y, "farm-orchard", frame)
+        .setDisplaySize(i % 4 === 0 ? 72 : 62, i % 4 === 0 ? 72 : 62)
+        .setDepth(7 + y / 100);
+    });
+    [[340, 385], [365, 400], [625, 385], [650, 390], [715, 575], [740, 590],
+      [1005, 385], [1030, 395], [1350, 520], [1380, 535], [690, 820], [720, 835],
+      [1120, 870], [1150, 885], [400, 760], [430, 770], [900, 1020], [930, 1030]].forEach(([x, y]) => {
+      this.add.image(x, y, "farm-details", "flower-patch")
+        .setDisplaySize(26, 26).setDepth(9);
+    });
+    // A small timber sign anchors the main crossroads.
+    const sign = this.add.graphics().setDepth(11);
+    sign.fillStyle(0x66452b, 1).fillRect(715, 286, 7, 40);
+    sign.fillStyle(0x9b6a35, 1).fillRoundedRect(692, 278, 54, 22, 3);
+    sign.lineStyle(2, 0xe0bd75, 1).strokeRoundedRect(692, 278, 54, 22, 3);
+    this.add.text(719, 289, "VILLAGE", { fontFamily: "monospace", fontSize: "7px", color: "#fff0c6", fontStyle: "bold" }).setOrigin(0.5).setDepth(12);
     this.add.text(275, 155, "FERNHOLLOW", {
       fontFamily: "monospace", fontSize: "18px", color: "#f8f0d7",
       stroke: "#35472b", strokeThickness: 5, fontStyle: "bold"
