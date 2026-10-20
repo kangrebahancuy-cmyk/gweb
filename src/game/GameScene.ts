@@ -104,9 +104,9 @@ export class GameScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setZoom(this.scale.width < 720 ? 0.82 : 1);
+    this.createAtlasFrames();
     this.drawWorld();
     this.cropGraphics = this.add.graphics().setDepth(12);
-    this.createAtlasFrames();
     this.obstacles = this.physics.add.staticGroup();
     this.createWorldObjects();
 
@@ -189,8 +189,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private drawWorld(): void {
+    this.add.tileSprite(0, 0, WORLD_WIDTH, WORLD_HEIGHT, "starter-atlas", "grass")
+      .setOrigin(0, 0).setDepth(-101).setAlpha(0.9);
     const g = this.add.graphics().setDepth(-100);
-    g.fillStyle(0x719b54, 1).fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     // Subtle grass variation gives the world texture without obscuring the imported sprites.
     for (let y = 16; y < WORLD_HEIGHT; y += 48) {
       for (let x = 16 + ((y / 48) % 2) * 18; x < WORLD_WIDTH; x += 48) {
