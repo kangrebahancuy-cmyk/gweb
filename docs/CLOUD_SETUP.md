@@ -31,3 +31,11 @@ The migration is authored but has not been applied to a database. The current Wo
 5. Add room capacity limits, movement simulation, collision validation, reconnect handling, and integration tests before production.
 
 No Cloudflare account ID, Hyperdrive ID, production domain, or secret is included in this repository.
+
+## Hyperdrive binding
+
+After creating a Hyperdrive configuration in Cloudflare for the Neon connection, uncomment the Hyperdrive binding in wrangler.toml and replace its ID with the actual configuration ID. Keep the Neon connection string inside Hyperdrive; do not put it in browser environment variables. The character API returns HTTP 503 until the binding is present.
+
+Set ALLOWED_ORIGIN to the exact production frontend origin before launch. The current wildcard CORS default is intended only to make local prototype setup easier; restrict it in production.
+
+The character endpoint creates at most one starter character per authenticated Supabase account and initializes starter skill/inventory rows in a SQL transaction. It does not yet synchronize the Phaser local inventory, crop timers, combat rewards, or quest state into Neon. Those game actions still need authenticated, server-authoritative endpoints before the economy can be considered persistent or secure.
