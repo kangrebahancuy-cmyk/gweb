@@ -98,6 +98,7 @@ async function handleCharacterRequest(request: Request, env: Env, userId: string
       return corsJson({ error: "Name must be 2–20 characters and use letters, numbers, spaces, _ or -." }, 400, env);
     }
     const character = await sql.begin(async (tx) => {
+      await tx`SELECT pg_advisory_xact_lock(hashtextextended(${userId}::text, 0))`;
       await tx`INSERT INTO accounts (user_id) VALUES (${userId}::uuid) ON CONFLICT (user_id) DO NOTHING`;
       const existing = await tx`SELECT id::text AS id, display_name, region_id, x, y, health, gold
         FROM characters WHERE user_id = ${userId}::uuid ORDER BY created_at ASC LIMIT 1`;
