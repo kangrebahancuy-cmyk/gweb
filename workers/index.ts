@@ -117,7 +117,7 @@ async function handleCharacterRequest(request: Request, env: Env, userId: string
       return created[0];
     });
     return corsJson({ character }, 200, env);
-  } catch (error) {
+  } catch {
     // Do not return SQL details or connection strings to clients.
     return corsJson({ error: "Could not load or create the character." }, 500, env);
   } finally {
@@ -186,7 +186,12 @@ export class GameRoom {
 
     let message: ClientMessage;
     try {
-      message = JSON.parse(raw) as ClientMessage;
+      const parsed: unknown = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object" || !("type" in parsed)) {
+        this.send(socket, { type: "error", message: "Invalid message" });
+        return;
+      }
+      message = parsed as ClientMessage;
     } catch {
       this.send(socket, { type: "error", message: "Malformed JSON" });
       return;
