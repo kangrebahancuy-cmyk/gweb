@@ -1,6 +1,7 @@
 export interface Env {
   GAME_ROOMS: DurableObjectNamespace;
   SUPABASE_URL: string;
+  SUPABASE_ANON_KEY: string;
 }
 
 type ClientMessage =
@@ -30,7 +31,7 @@ export default {
     if (!token || !env.SUPABASE_URL) {
       return new Response("Authentication is not configured", { status: 503 });
     }
-    const user = await verifySupabaseUser(token, env.SUPABASE_URL);
+    const user = await verifySupabaseUser(token, env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
     if (!user) return new Response("Invalid or expired session", { status: 401 });
 
     const roomId = url.searchParams.get("region") ?? "fern-hollow";
@@ -45,12 +46,13 @@ export default {
 
 async function verifySupabaseUser(
   accessToken: string,
-  supabaseUrl: string
+  supabaseUrl: string,
+  anonKey: string
 ): Promise<{ id: string } | null> {
   const authUrl = new URL("/auth/v1/user", supabaseUrl);
   try {
     const response = await fetch(authUrl, {
-      headers: { Authorization: "Bearer " + accessToken, apikey: accessToken }
+      headers: { Authorization: "Bearer " + accessToken, apikey: anonKey }
     });
     if (!response.ok) return null;
     const data = (await response.json()) as { id?: unknown };
@@ -61,13 +63,8 @@ async function verifySupabaseUser(
 }
 
 export class GameRoom {
-  private state: DurableObjectState;
   private sockets = new Map<WebSocket, { userId: string; characterId: string; x: number; y: number; seq: number }>();
   private rate = new Map<WebSocket, { startedAt: number; count: number }>();
-
-  constructor(state: DurableObjectState) {
-    this.state = state;
-  }
 
   async fetch(request: Request): Promise<Response> {
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
